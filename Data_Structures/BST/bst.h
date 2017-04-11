@@ -34,3 +34,8 @@ int insert(node_t* root, int data_int);
 
 node_t* createNode(data_t*);
 tree_t* createTree(node_t*);
+
+node_t* searchForNode(node_t*);
+node_t* searchForData(int, node_t*);
+
+int deleteNode(int data, node_t* root);

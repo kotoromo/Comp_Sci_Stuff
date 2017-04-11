@@ -8,20 +8,20 @@ int main(void){
   int r = rand();
 
   node_t* root = (node_t*) calloc(1, sizeof(node_t));
-  root -> data = 50;
+  root -> data = 10;
   root -> parent = NULL;
 
   printf("root_data: %d\n", root -> data);
 
-  int arr[50];
+  int arr[8] = {5, 2, 1, 4, 8, 6, 9, 7};
 
   /*for(int i = 0; i< 50; i++){
     arr[i] = r;
-  }
-
-  for(int i = 0; i < 50; i++){
-    insert(root, arr[i]);
   }*/
+
+  for(int i = 0; i < 8; i++){
+    insert(root, arr[i]);
+  }
 
   //insert(root, 10022312);
 
@@ -38,15 +38,15 @@ int main(void){
 
   }*/
 
-  insert(root, 70);
+  /*insert(root, 70);
   insert(root, 60);
   insert(root, 65);
   insert(root, 80);
   insert(root, 75);
-  insert(root, 85);
-  printf("root -> r_child -> data: %d\n",root -> r_child -> data);
-  printf("Deleted data: %d\n", deleteNode(70, root));
-  printf("root -> r_child -> data: %d\n",root -> r_child -> data);
+  insert(root, 85);*/
+  printf("root -> r_child -> data: %d\n",root -> l_child -> data);
+  printf("Deleted data: %d\n", deleteNode(5, root));
+  printf("root -> r_child -> data: %d\n",root -> l_child -> data);
 
   free(root);
   return 0;
@@ -121,6 +121,7 @@ node_t* searchForData(int data, node_t* root){
 }
 
 int deleteNode(int data, node_t* root){
+  int val = 0;
   node_t* found = searchForData(data, root);
 
   if (found == NULL){
@@ -189,36 +190,46 @@ int deleteNode(int data, node_t* root){
 
   /*Deletion of a node with two children. */
   if(found -> r_child != NULL && found -> l_child != NULL){
-    /*First we need to find the node which key is the next biggest one relative
-    to the node we are removing.
+    /* In order to maintain the BST's properties, we must look for a way such
+    that removing a single node would not affect these properties.
 
-    To remove it then, we must find a node which key is the next biggest thing
-    relative to the node we are removing. We know that the bigger than root
-    nodes are on the root's right side... So we just need to find the node with
-    the smallest key from the node we wish to remove right branch.*/
+    In order to accomplish that, we must do the following:
+      - We must look for a number which is smaller then the root's most-right
+      child but bigger than the root (node which we want to delete).
 
-    node_t* node_ptr = found -> r_child -> l_child;
-    while(node_ptr -> l_child != NULL){
-      node_ptr = node_ptr -> l_child;
-      printf("[FUNCTION: deleteNode] node_ptr -> data: %d", node_ptr -> data);
+    For that, we must make use of the BST's properties: By exploring the root's
+    right branch it's obvious we will find values which are grater than that of
+    the root. Then, if we want to find the smallest value in the right branch,
+    we must then look at the root's right child's deepest node with a left
+    child and substitute that key for the one we want to delete so that it gets
+    replaced succesfully and thus enables us to delete it without worries.
+
+    We cannot do it's left side counterpart (finding the maximum of the minimum)
+    as that would disrupt the tree's balance. (NOTE: ask someone with more
+    knowledge/smarter)*/
+
+    node_t* ptr = found;
+    while(ptr -> r_child -> l_child != NULL){
+      ptr = ptr -> r_child;
+      printf("[FUNCTION: deleteNode] ptr -> data: %d\n", ptr -> data);
     }
 
-    node_ptr -> parent = found -> parent;
-    node_ptr -> l_child = found -> l_child;
-    node_ptr -> r_child = found -> r_child;
-
-    //Find out if 'found' is is a r_child or a l_child from its parent.
-    if(found -> parent -> data > found -> data){
-      //It's a l_child
-      found -> parent -> l_child = node_ptr;
-    }else{
-      //It's a r_child
-      found -> parent -> r_child = node_ptr;
+    /*We traversed to the most-right node with a left child. Now we must
+    traverse the most left child of the most right node's left branch.*/
+    while(ptr -> l_child != NULL){
+      ptr = ptr -> l_child;
     }
 
+    /*We do the appropiate steps in order to swap the nodes.*/
+    /* NOTE: Because of how I implemented the deletions, the following code
+    is quite baaaaaad. I'll eventually fix this :9 */
+    val = found -> data; //this is baaaaaad
+    found -> data = ptr -> data;
+    found = ptr;
+    found -> data = val; //This aswell :S
   }
 
-  int val = found -> data;
+  val = found -> data;
   free(found);
 
   return val;

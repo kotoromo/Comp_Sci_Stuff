@@ -7,53 +7,28 @@ int main(void){
   srand(time(NULL));
   int r = rand();
 
-  node_t* root = (node_t*) calloc(1, sizeof(node_t));
-  root -> data = 10;
-  root -> parent = NULL;
-
-  printf("root_data: %d\n", root -> data);
-
-  int arr[8] = {5, 2, 1, 4, 8, 6, 9, 7};
+  int arr[9] = {5, 1, 9, 8, 15, 13, 45, 47, 46};
 
   /*for(int i = 0; i< 50; i++){
     arr[i] = r;
   }*/
+  node_t* root = (node_t*) calloc(1, sizeof(node_t));
+  root -> data = 38;
 
-  for(int i = 0; i < 8; i++){
+  for(int i = 0; i < 9; i++){
     insert(root, arr[i]);
   }
 
-  //insert(root, 10022312);
+  printf("root: %d\n", root -> data);
+  printf("Deleted data: %d\n", deleteNode(38, root));
+  printf("root: %d\n", root -> data);
 
-  //printf("root -> l_child -> data: %d\n", root -> l_child -> data);
-  /*printf("root -> r_child -> data: %d\n", root -> r_child -> data);
-  printf("root -> r_child -> r_child -> l_child -> data: %d\n", root -> r_child -> l_child -> data);
-  printf("root -> r_child -> l_child -> r_child ->data: %d\n", root -> r_child -> l_child -> r_child -> data);
-  printf("root -> r_child -> l_child -> l_child ->data: %d\n", root -> r_child -> l_child -> l_child -> data);
-  printf("root -> r_child -> l_child -> l_child -> l_child -> data: %d\n", root -> r_child -> l_child -> l_child -> l_child -> data);
-
-  node_t* found = searchForData(10022312, root);
-  if (found != NULL){
-    printf("Node found with address: %p. Value: %d\n", found, found -> data);
-
-  }*/
-
-  /*insert(root, 70);
-  insert(root, 60);
-  insert(root, 65);
-  insert(root, 80);
-  insert(root, 75);
-  insert(root, 85);*/
-  printf("root -> r_child -> data: %d\n",root -> l_child -> data);
-  printf("Deleted data: %d\n", deleteNode(5, root));
-  printf("root -> r_child -> data: %d\n",root -> l_child -> data);
-
-  free(root);
   return 0;
 }
 
 int insert(node_t* root, int data_int){
   if (root == NULL){
+
     return EXIT_FAILURE;
   }
 
@@ -114,6 +89,7 @@ node_t* searchForData(int data, node_t* root){
     searchForData(data, root_ptr);
 
   }else if(data > root_ptr -> data){
+    /* Else, we search on the right */
     root_ptr = root_ptr -> r_child;
     searchForData(data, root_ptr);
 
@@ -209,13 +185,21 @@ int deleteNode(int data, node_t* root){
     knowledge/smarter)*/
 
     node_t* ptr = found;
-    while(ptr -> r_child -> l_child != NULL){
+
+    if(ptr -> r_child -> l_child != NULL){
+      while(ptr -> r_child -> l_child != NULL){
+        ptr = ptr -> r_child;
+        printf("[FUNCTION: deleteNode] ptr -> data: %d\n", ptr -> data);
+      }
+
+    }else{
+      //Since the r_child doesn't have a left branch, then we just set the
+      //r_child as the lowest maximum value.
       ptr = ptr -> r_child;
-      printf("[FUNCTION: deleteNode] ptr -> data: %d\n", ptr -> data);
     }
 
-    /*We traversed to the most-right node with a left child. Now we must
-    traverse the most left child of the most right node's left branch.*/
+      /*We traversed to the most-right node with a left child. Now we must
+      traverse the most left child of the most right node's left branch.*/
     while(ptr -> l_child != NULL){
       ptr = ptr -> l_child;
     }

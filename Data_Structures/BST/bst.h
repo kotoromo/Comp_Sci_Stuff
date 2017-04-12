@@ -39,3 +39,4 @@ node_t* searchForNode(node_t*);
 node_t* searchForData(int, node_t*);
 
 int deleteNode(int data, node_t* root);
+void freeTree(node_t* root);

@@ -19,9 +19,14 @@ int main(void){
     insert(root, arr[i]);
   }
 
-  printf("root: %d\n", root -> data);
+  //printf("root: %d\n", root -> data);
   printf("Deleted data: %d\n", deleteNode(38, root));
   printf("root: %d\n", root -> data);
+  /*printf("root -> r_child -> data: %d\n", root -> r_child -> data);
+
+  printf("Deleted data: %d\n", deleteNode(45, root));
+*/
+  TraverseInOrder(root);
 
   return 0;
 }
@@ -100,125 +105,66 @@ int deleteNode(int data, node_t* root){
   int val = 0;
   node_t* found = searchForData(data, root);
 
-  if (found == NULL){
-    return EXIT_SUCCESS;
-  }
+  if (found -> l_child != NULL && found -> r_child != NULL){
+    node_t* ptr = found -> l_child;
 
-  /* Deleting a leaf node from the tree */
-  if (found -> l_child == NULL && found -> r_child == NULL){
-
-    if (found -> data > found -> parent -> data){
-      found -> parent -> r_child = NULL;
-
-    }else if(found -> data < found -> parent -> data){
-      found -> parent -> l_child = NULL;
-
-    }
-
-    found -> parent = NULL;
-
-  }
-
-  /* Deleting a node with 1 child */
-  if (
-    (found -> l_child != NULL && found -> r_child == NULL) ||
-    (found -> l_child == NULL && found -> r_child != NULL)
-  ){
-    node_t* child;
-    //Is this node on the right or left of the parent?
-    if(found -> parent -> data > found -> data){
-      //It's a left child of the parent.
-      if (found -> l_child != NULL){
-        //if found's left child is not null...
-        child = found -> l_child;
-        found -> l_child = NULL;
-
-      }else{
-        //If found's right child is not null...
-        child = found -> r_child;
-        found -> r_child = NULL;
-
-      }
-
-      found -> parent -> l_child = child;
-      child -> parent = found -> parent;
-      found -> parent = NULL;
-
-    }else if (found -> parent -> data < found -> data){
-      //It's a right child of the parent.
-      if (found -> r_child != NULL){
-        //If found's right child is not NULL;
-        child = found -> r_child;
-        found -> r_child = NULL;
-      }else{
-        child = found -> l_child;
-        found -> l_child = NULL;
-
-      }
-
-      found -> parent -> r_child = child;
-      child -> parent = found -> parent;
-      found -> parent = NULL;
-
-    }
-
-  }
-
-  /*Deletion of a node with two children. */
-  if(found -> r_child != NULL && found -> l_child != NULL){
-    /* In order to maintain the BST's properties, we must look for a way such
-    that removing a single node would not affect these properties.
-
-    In order to accomplish that, we must do the following:
-      - We must look for a number which is smaller then the root's most-right
-      child but bigger than the root (node which we want to delete).
-
-    For that, we must make use of the BST's properties: By exploring the root's
-    right branch it's obvious we will find values which are grater than that of
-    the root. Then, if we want to find the smallest value in the right branch,
-    we must then look at the root's right child's deepest node with a left
-    child and substitute that key for the one we want to delete so that it gets
-    replaced succesfully and thus enables us to delete it without worries.
-
-    We cannot do it's left side counterpart (finding the maximum of the minimum)
-    as that would disrupt the tree's balance. (NOTE: ask someone with more
-    knowledge/smarter)*/
-
-    node_t* ptr = found;
-
-    if(ptr -> r_child -> l_child != NULL){
-      while(ptr -> r_child -> l_child != NULL){
-        ptr = ptr -> r_child;
-        printf("[FUNCTION: deleteNode] ptr -> data: %d\n", ptr -> data);
-      }
-
-    }else{
-      //Since the r_child doesn't have a left branch, then we just set the
-      //r_child as the lowest maximum value.
+    while(ptr -> r_child != NULL){
       ptr = ptr -> r_child;
     }
 
-      /*We traversed to the most-right node with a left child. Now we must
-      traverse the most left child of the most right node's left branch.*/
-    while(ptr -> l_child != NULL){
-      ptr = ptr -> l_child;
+    found -> data = ptr -> data;
+    deleteNode(ptr -> data, ptr);
+
+  }else if(found -> l_child != NULL || found -> r_child != NULL){
+    node_t* ptr = found;
+
+    //is found an r_child or l_child?
+    if (found -> data > found -> parent -> data){
+      //Found node is an r_child
+      if(found -> l_child != NULL){
+        found -> parent -> r_child = found -> l_child;
+      }else{
+        found -> parent -> r_child = found -> r_child;
+      }
+    }else{
+      //FOund node is an l_child:
+      if(found -> r_child != NULL){
+        found -> parent -> l_child = found -> l_child;
+      }else{
+        found -> parent -> l_child = found -> r_child;
+      }
+
     }
 
-    /*We do the appropiate steps in order to swap the nodes.*/
-    /* NOTE: Because of how I implemented the deletions, the following code
-    is quite baaaaaad. I'll eventually fix this :9 */
-    val = found -> data; //this is baaaaaad
-    found -> data = ptr -> data;
-    found = ptr;
-    found -> data = val; //This aswell :S
-  }
+    free(found);
 
-  val = found -> data;
-  free(found);
+  }else if(found -> l_child == NULL && found -> r_child == NULL){
+    //is found an r_child or l_child?
+    if (found -> parent -> data > found -> data){
+      //found is an l_child
+      found -> parent -> l_child = NULL;
+
+    }else{
+      //found is an r_child.
+      found -> parent -> r_child = NULL;
+    }
+
+    free(found);
+  }
 
   return val;
 }
 
 char* TraverseInOrder(node_t* root){
+  if(root == NULL){
+    return "a";
+  }
+  node_t* ptr = root;
+  TraverseInOrder(ptr -> l_child);
+  printf("-> %d", ptr -> data);
+  TraverseInOrder(ptr -> r_child);
+
+  //NOTE: For some reason it still prints out the deleted value... :/
+
   return "a";
 }

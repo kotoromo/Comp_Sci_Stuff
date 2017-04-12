@@ -4,29 +4,6 @@
 #include <time.h>
 
 int main(void){
-  srand(time(NULL));
-  int r = rand();
-
-  int arr[9] = {5, 1, 9, 8, 15, 13, 45, 47, 46};
-
-  /*for(int i = 0; i< 50; i++){
-    arr[i] = r;
-  }*/
-  node_t* root = (node_t*) calloc(1, sizeof(node_t));
-  root -> data = 38;
-
-  for(int i = 0; i < 9; i++){
-    insert(root, arr[i]);
-  }
-
-  //printf("root: %d\n", root -> data);
-  printf("Deleted data: %d\n", deleteNode(38, root));
-  printf("root: %d\n", root -> data);
-  /*printf("root -> r_child -> data: %d\n", root -> r_child -> data);
-
-  printf("Deleted data: %d\n", deleteNode(45, root));
-*/
-  TraverseInOrder(root);
 
   return 0;
 }
@@ -102,7 +79,6 @@ node_t* searchForData(int data, node_t* root){
 }
 
 int deleteNode(int data, node_t* root){
-  int val = 0;
   node_t* found = searchForData(data, root);
 
   if (found -> l_child != NULL && found -> r_child != NULL){
@@ -116,7 +92,6 @@ int deleteNode(int data, node_t* root){
     deleteNode(ptr -> data, ptr);
 
   }else if(found -> l_child != NULL || found -> r_child != NULL){
-    node_t* ptr = found;
 
     //is found an r_child or l_child?
     if (found -> data > found -> parent -> data){
@@ -152,7 +127,7 @@ int deleteNode(int data, node_t* root){
     free(found);
   }
 
-  return val;
+  return EXIT_SUCCESS;
 }
 
 char* TraverseInOrder(node_t* root){
